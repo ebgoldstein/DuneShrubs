@@ -189,5 +189,5 @@ xlabel('alongshore distance')
 
 %test as a function of dispersal kernal function...
 %can be matched to the linear invadsion rate of shrub front on Hog:
-%4km/ 26 years ? 153m/yr calculated from Fig1 of Zinnert 2011)
+%4km/ 26 years ?Â 153m/yr calculated from Fig1 of Zinnert 2011)
 
