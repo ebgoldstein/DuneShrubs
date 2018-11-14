@@ -245,7 +245,7 @@ for t = 2:1:TMAX % Yearly time steps
                 
                 %Remove the relevant slice of the array to opertate on.
                 ShrubMortF=squeeze(ShrubDomainFemale(t,:,:));
-                ShrubMortM=squeeze(ShrubDomainFemale(t,:,:));
+                ShrubMortM=squeeze(ShrubDomainMale(t,:,:));
                 for d = 1:length(Dow)
                     DuneDomain(t,Dow(d)) = DuneDomain(t,Dow(d)) * Low; % Less efficient - but works
                     % Kill 1-year-old shrubs behind overwashed dunes
