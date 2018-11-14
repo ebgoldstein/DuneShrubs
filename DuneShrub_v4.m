@@ -1,6 +1,6 @@
-% A model of Dunes, Shrubs and TWL started by EBG in 7/2017
+% A model of Dunes, Shrubs and TWL 
 
-% IRBR - 13 Nov 18
+% started by EBG in 7/2017; IRBR 10-11/18
 % Version 4 includes:
 %     + NO elevation
 %     + Storms at frequency and magnitude according to Hog Island TWL time series
@@ -27,14 +27,10 @@ tic
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% TIME
-
 TMAX = 15;
 StormStart = 3;
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% COMPUTATIONAL DOMAIN (meters)
-
 DomainLength = 1000;
 DomainWidth = 100;
 DuneDomain = zeros(TMAX,DomainLength);
@@ -43,10 +39,8 @@ ShrubDomainFemale = ShrubDomainAll;
 ShrubDomainMale = ShrubDomainAll;
 ShrubPercentCover = ShrubDomainAll;
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% DUNE
-
 % Initial elevation of the dune domain
 % DuneDomain(1,:)=ones(1,DomainLength)*0.1;
 DuneDomain(1,:) = ones(1,DomainLength) .* (1.1 + (-0.1 + (0.1 - (-0.1))*rand(1,DomainLength)));
@@ -59,8 +53,6 @@ Dmax = 3; % Originally 5
 rmin = 0.05;
 rmax = 0.55;
 growthrate = rmax + (rmax-rmin).*rand(1,DomainLength);
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% STORM
 
@@ -72,11 +64,10 @@ B_storm = 4.5301;
 mu_storm = 1.1075; %1.1075
 sigma_storm = 0.3353; %0.3353
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% SHRUB
 
-% Shrub Growth from Julie's email
+% Shrub Growth from JCZ
 % Minimum dune height for shrub growth
 Dshrub = 2;
 
@@ -113,8 +104,6 @@ Female = 0.5;
 
 % Initiate Shrubs
 ShrubDomainFemale(1,round(DomainLength/2),round(DomainWidth/2)) = 5;
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % RUN MODEL      
@@ -251,19 +240,31 @@ for t = 2:1:TMAX % Yearly time steps
                 Low = unifrnd(0.3,0.8); % Long et al. (2014) - 80% of observed change fall within 30-80% of pre-storm dune height
                 Dow = find(DuneDomain(t,:) < TWL(n)); % All overwashed dune cells
                 OWdist = randi([30 80], length(Dow), 1); % Random overwash penetration distance
-%                 DuneDomain(DuneDomain(t,:) < TWL(n)) = DuneDomain(DuneDomain(t,:) < TWL(n)) * Low; % Lower dunes -- Doesn't work
+                %                 DuneDomain(DuneDomain(t,:) < TWL(n)) = DuneDomain(DuneDomain(t,:) < TWL(n)) * Low; % Lower dunes -- Doesn't work
+                
+                
+                %Remove the relevant slice of the array to opertate on.
+                ShrubMortF=squeeze(ShrubDomainFemale(t,:,:));
+                ShrubMortM=squeeze(ShrubDomainFemale(t,:,:));
                 for d = 1:length(Dow)
                     DuneDomain(t,Dow(d)) = DuneDomain(t,Dow(d)) * Low; % Less efficient - but works
                     % Kill 1-year-old shrubs behind overwashed dunes
-                    ShrubDomainFemale(ShrubDomainFemale(t,Dow(d),1:OWdist(d)) == 1) = 0; % Doesn't seem to work
-                    ShrubDomainMale(ShrubDomainMale(t,Dow(d),1:OWdist(d)) == 1) = 0; % Doesn't seem to work
+                    ShrubMortF(ShrubMortF(Dow(d),1:OWdist(d)) == 1) = 0; % Doesn't seem to work
+                    ShrubMortM(ShrubMortM(Dow(d),1:OWdist(d)) == 1) = 0; % Doesn't seem to work
                     % Kill all shrubs behind dunes lowered below threshold height
+                end
+                %Put the relevant slice of the array back in.
+                ShrubDomainFemale(t,:,:)=ShrubMortF;
+                ShrubDomainMale(t,:,:)=ShrubMortM;
+                
+                % Kill all shrubs behind dunes lowered below threshold height
+                for d = 1:length(Dow)
                     if DuneDomain(Dow(d)) < Dshrub
-                            ShrubDomainFemale(t,Dow(d),1:OWdist(d)) = 0;
-                            ShrubDomainMale(t,Dow(d),1:OWdist(d)) = 0;
+                        ShrubDomainFemale(t,Dow(d),1:OWdist(d)) = 0;
+                        ShrubDomainMale(t,Dow(d),1:OWdist(d)) = 0;
                     end
-                end 
-
+                end
+                
                 % Enforce maximum dune slope angle (37% from Rastetter model, i.e. 0.8 m in height diff betwen 1 m long dune cells)
                 for d = 2:(DomainLength) % Loop L to R
                     Lslope = DuneDomain(t,d) - DuneDomain(t,d-1); % Calculate height difference
@@ -324,4 +325,4 @@ DuneShrubMovie(ShrubDomainAll,TMAX,1);
 
 %test as a function of dispersal kernal function...
 %can be matched to the linear invadsion rate of shrub front on Hog:
-%4km/ 26 years ? 153m/yr calculated from Fig1 of Zinnert 2011)
+%4km/ 26 years ? 153m/yr calculated from Fig1 of Zinnert 2011)
