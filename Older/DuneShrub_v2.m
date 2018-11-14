@@ -281,6 +281,6 @@ DuneShrubMovie(ShrubPercentCover,TMAX,2);
 
 %test as a function of dispersal kernal function...
 %can be matched to the linear invadsion rate of shrub front on Hog:
-%4km/ 26 years ? 153m/yr calculated from Fig1 of Zinnert 2011)
+%4km/ 26 years ?Â 153m/yr calculated from Fig1 of Zinnert 2011)
 
 fprintf('\nElapsed time: %.2f\n', toc); % Print elapsed time of program
